@@ -6,25 +6,15 @@ import (
 	"math"
 
 	"github.com/theDataFlowClub/ruptures/core/base"
-	"github.com/theDataFlowClub/ruptures/core/types" // Asegúrate de que el import sea correcto
+	"github.com/theDataFlowClub/ruptures/core/types"
 )
 
 // maxDiscreteValue define el tamaño máximo del alfabeto para el histograma.
-// Para datos de tipo byte (0-255), es 256. Ajústalo si tus valores discretos
-// tienen un rango diferente (ej. si usas int y los valores pueden ser mayores).
 const maxDiscreteValue = 256
 
 // CostEntropy implementa base.CostFunction para el costo basado en entropía de Shannon.
-// Asume una señal univariada de tipo byte o int convertida a byte.
 type CostEntropy struct {
-	// signalData: La señal original, almacenada para referencias si es necesario.
-	// No se usa directamente en Error() una vez que los prefixHistograms están listos.
-	signalData types.Matrix
-
-	// prefixHistograms: Almacena histogramas acumulativos.
-	// prefixHistograms[k][val] contendrá el conteo de 'val' en signalData[0]...signalData[k-1].
-	// La longitud de este slice será numSamples + 1, para permitir calcular rangos [0,k).
-	// Cada elemento es un array de 256 ints, representando los conteos acumulados de cada posible byte.
+	signalData       types.Matrix
 	prefixHistograms [][]int
 }
 
@@ -42,7 +32,7 @@ func (c *CostEntropy) Fit(signal types.Matrix) error {
 		return errors.New("CostEntropy: requires univariate signal (e.g., []float64{val}) representing discrete values")
 	}
 
-	c.signalData = signal // Almacenamos la señal
+	c.signalData = signal
 
 	numSamples := len(signal)
 	// Inicializamos prefixHistograms. `numSamples+1` para incluir un histograma "vacío" en el índice 0.
@@ -56,7 +46,10 @@ func (c *CostEntropy) Fit(signal types.Matrix) error {
 	currentHist := make([]int, maxDiscreteValue)
 
 	for i := 0; i < numSamples; i++ {
-		// Copiamos el histograma acumulado anterior
+		// Creamos el slice interno para c.prefixHistograms[i+1] ANTES de copiar en él
+		c.prefixHistograms[i+1] = make([]int, maxDiscreteValue) // <-- ¡¡ESTO ES CLAVE!!
+
+		// Copiamos el estado actual de currentHist (que representa el prefijo hasta i-1)
 		copy(c.prefixHistograms[i+1], currentHist)
 
 		// Obtenemos el valor de la muestra actual
@@ -78,8 +71,6 @@ func (c *CostEntropy) Fit(signal types.Matrix) error {
 }
 
 // Error calcula el costo de entropía de Shannon para un segmento [start, end)
-// utilizando los histogramas de prefijo para una eficiencia O(AlphabetSize).
-// El costo es (longitud del segmento) * Entropía.
 func (c *CostEntropy) Error(start, end int) (float64, error) {
 	if c.prefixHistograms == nil || len(c.prefixHistograms) == 0 {
 		return 0, errors.New("CostEntropy: Fit() must be called before Error()")
@@ -95,8 +86,6 @@ func (c *CostEntropy) Error(start, end int) (float64, error) {
 
 	entropy := 0.0
 
-	// Calculamos el histograma del segmento restando los histogramas de prefijo.
-	// segmentCounts[val] = count of 'val' in signal[start:end]
 	for val := 0; val < maxDiscreteValue; val++ {
 		count := c.prefixHistograms[end][val] - c.prefixHistograms[start][val]
 		if count > 0 {
@@ -114,8 +103,6 @@ func (c *CostEntropy) Model() string {
 }
 
 // GetKernel es un método stub, no aplicable para CostEntropy.
-// Se incluye para satisfacer la interfaz `base.CostFunction` si esta lo requiere.
-// Si tu interfaz base.CostFunction NO tiene GetKernel, puedes eliminar este método.
 func (c *CostEntropy) GetKernel() (interface{}, error) {
 	return nil, errors.New("CostEntropy does not support GetKernel")
 }
@@ -123,6 +110,6 @@ func (c *CostEntropy) GetKernel() (interface{}, error) {
 // init function is called automatically when the package is initialized.
 func init() {
 	RegisterCostFunction("entropy", func() base.CostFunction {
-		return NewCostRbf(nil)
+		return NewCostEntropy() // <-- ¡AHORA ESTO ES CORRECTO!
 	})
 }

@@ -27,6 +27,7 @@ func RegisterCostFunction(model string, constructor func() base.CostFunction) {
 		panic(fmt.Sprintf("cost function model '%s' already registered", model))
 	}
 	costFactoryRegistry[model] = constructor
+	fmt.Printf("DEBUG: Cost function '%s' registered.\n", model) // <-- Añade esta línea
 }
 
 // NewCost creates and returns a new instance of a CostFunction based on its model name.
@@ -34,7 +35,7 @@ func RegisterCostFunction(model string, constructor func() base.CostFunction) {
 //
 // Parameters:
 //
-//	model: The string identifier for the desired cost function (e.g., "l2", "l1", "rbf").
+//	model: The string identifier for the desired cost function (e.g., "l2", "l1", "rbf", "entropy").
 //
 // Returns:
 //

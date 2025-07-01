@@ -14,8 +14,6 @@ import (
 )
 
 // CostRbf implements the kernel cost function using an RBF kernel.
-
-// CostRbf implements the kernel cost function using an RBF kernel.
 type CostRbf struct {
 	Signal         types.Matrix // The fitted signal (n_samples, n_features)
 	minSegmentSize int          // Minimum segment size, default 1 // <-- CAMBIADO AQUÍ
@@ -201,6 +199,6 @@ func (c *CostRbf) SetCachedGramForTest(gram types.Matrix) {
 // init function is called automatically when the package is initialized.
 func init() {
 	RegisterCostFunction("rbf", func() base.CostFunction {
-		return NewCostRbf(nil)
+		return NewCostEntropy()
 	})
 }

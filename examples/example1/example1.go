@@ -48,6 +48,7 @@ func main() {
 	// La función ParseArgs está en el paquete cmdutils y se encarga de leer
 	// el nombre del modelo y la penalización de los argumentos de la terminal.
 	params := cmdutils.ParseArgs(os.Args)
+	fmt.Printf("DEBUG: Parámetro de función de costo recibido: '%s'\n", params.CostFuncName) // <-- Línea de depuración 1
 
 	// --- 3. Crear un objeto de la función de costo seleccionada ---
 	// Utilizamos la fábrica NewCost del paquete 'cost' para obtener una instancia
