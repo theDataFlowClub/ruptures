@@ -6,14 +6,14 @@ A Go re-implementation of change point detection algorithms, inspired by the Pyt
 
 ## ✨ Overview
 
-This library provides efficient, modular implementations of change point detection algorithms such as:
+This library provides a modular implementations of change point detection algorithms such as:
 
 - PELT (Pruned Exact Linear Time)
 - Binary Segmentation
 - Bottom-Up Segmentation
 - Window-based approaches
 
-It also includes cost functions (L1, L2, RBF) and metric evaluation utilities. The goal is to offer a fast, type-safe, and embeddable library in Go for time series segmentation and signal analysis.
+It also includes cost functions (L1, L2, RBF, entropy) and metric evaluation utilities. The goal is to offer a fast, type-safe, and embeddable library in Go for time series segmentation and signal analysis.
 
 ## 📦 Features
 
@@ -21,34 +21,34 @@ It also includes cost functions (L1, L2, RBF) and metric evaluation utilities. T
 - Clean separation between cost functions and detection methods
 - Fully compatible with custom input pipelines
 - Suitable for CLI tools, web backends, or embedded systems
-- MIT-licensed and open to commercial or academic use
 
 ## 🔧 Project Layout
 
+Estructura propuesta en Go, inspirada en la modularidad de `ruptures`:
+
 ```text
-
-dxm/
+rupture/
+├── cmd/                  # CLI para probar, correr, exportar resultados
 ├── core/
-│   ├── base/        # Interfaces for CostFunction, Estimator
-│   ├── cost/        # Cost functions: L2, L1, RBF, custom
-│   ├── detection/   # Algorithms: PELT, Binseg, etc.
-│   ├── metrics/     # Precision, recall, coverage
-│   ├── utils/       # Helper functions (e.g., sanity checks)
-│   └── exceptions/  # Typed error definitions
-├── cmd/             # CLI entrypoints (if needed)
-├── web/             # (Optional) Web rendering layer
+│   ├── base/             # Interfaces clave: CostFunction, Estimator
+│   ├── cmdutils/         # 
+│   ├── cost/             # Costos L1, L2, RBF... testables de forma independiente
+│   ├── datasets/         # Simulación de señales (¡útil para tests!)
+│   ├── detection/        # Algoritmos separados por carpeta = 💯
+│   └── exceptions/       # `ErrInvalidSegment`, `ErrIncompatibleCost`, etc.
+│   └── kernels/          # Base para libreria autonoma: pykernels port
+│   └── linalg/           # utilerias de Gonum / Algebra lineal : shotcuts, envoltorios
+│   └── stat/             # utilerias de Gonum / Stats: shotcuts, envoltorio + scypy portss
+│   ├── metrics/          # Precision, coverage, F1, etc.
+│   ├── types/            # 
+│   ├── utils/            # Funciones como `SanityCheck()`, padding, slicing...
+├── docs/                 # Herramientas para generacion de documentacion / RAG
+├── go.mod                # Manejo de dependencias limpio
+├── README.md             # Main page
+├── license               # LICENSE
+├── plan.md               # Roadmap de implementación, dependencias, etc.
+└── logbook.md            # Registro de decisiones, experimentos o insights
 
-```
-
-## 🔍 Example (Coming Soon)
-
-```go
-// Example: PELT on simulated signal
-signal := generatePiecewiseConstant(200)
-pelt := changepoint.NewPelt(cost.L2{}, minSize=3, jump=5)
-pelt.Fit(signal)
-bkps := pelt.Predict(penalty=10.0)
-fmt.Println("Breakpoints:", bkps)
 ```
 
 ## 🏁 Goals
@@ -66,7 +66,7 @@ While this project does not copy code from `ruptures`, it reimplements similar c
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+See the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributions
 

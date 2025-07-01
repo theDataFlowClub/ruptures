@@ -33,13 +33,18 @@ rupture/
 ├── cmd/                  # CLI para probar, correr, exportar resultados
 ├── core/
 │   ├── base/             # Interfaces clave: CostFunction, Estimator
-│   ├── types/            # 
+│   ├── cmdutils/         # 
 │   ├── cost/             # Costos L1, L2, RBF... testables de forma independiente
-│   ├── detection/        # Algoritmos separados por carpeta = 💯
-│   ├── metrics/          # Precision, coverage, F1, etc.
 │   ├── datasets/         # Simulación de señales (¡útil para tests!)
-│   ├── utils/            # Funciones como `SanityCheck()`, padding, slicing...
+│   ├── detection/        # Algoritmos separados por carpeta = 💯
 │   └── exceptions/       # `ErrInvalidSegment`, `ErrIncompatibleCost`, etc.
+│   └── kernels/          # Base para libreria autonoma: pykernels port
+│   └── linalg/           # utilerias de Gonum / Algebra lineal : shotcuts, envoltorios
+│   └── stat/             # utilerias de Gonum / Stats: shotcuts, envoltorio + scypy portss
+│   ├── metrics/          # Precision, coverage, F1, etc.
+│   ├── types/            # 
+│   ├── utils/            # Funciones como `SanityCheck()`, padding, slicing...
+├── docs/                 # Herramientas para generacion de documentacion / RAG
 ├── go.mod                # Manejo de dependencias limpio
 ├── README.md             # Main page
 ├── license               # LICENSE
